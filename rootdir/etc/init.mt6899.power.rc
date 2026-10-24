@@ -17,8 +17,9 @@ on init
     write /dev/sys/block/by-name/rootdisk/queue/iostats 0
     write /dev/sys/block/by-name/rootdisk/queue/nr_requests 256
 
-    write /dev/cpuset/foreground/cpus 0-5
-    write /dev/cpuset/foreground_window/cpus 0-6
+    # cpu7 (big core) dibuka buat foreground & foreground_window
+    write /dev/cpuset/foreground/cpus 0-7
+    write /dev/cpuset/foreground_window/cpus 0-7
     write /dev/cpuset/background/cpus 0-1
     write /dev/cpuset/system-background/cpus 0-2
     write /dev/cpuset/top-app/cpus 0-7
@@ -112,13 +113,13 @@ on init
     # Foreground tasks
     write /dev/cpuctl/foreground/cpu.uclamp.latency_sensitive 1
     write /dev/cpuctl/foreground/cpu.uclamp.min 10
-    write /dev/cpuctl/foreground/cpu.uclamp.max 80
+    write /dev/cpuctl/foreground/cpu.uclamp.max max
     write /dev/cpuctl/foreground/cpu.shares 20480
 
     # Foreground window tasks
     write /dev/cpuctl/foreground_window/cpu.uclamp.latency_sensitive 1
     write /dev/cpuctl/foreground_window/cpu.uclamp.min 0
-    write /dev/cpuctl/foreground_window/cpu.uclamp.max 80
+    write /dev/cpuctl/foreground_window/cpu.uclamp.max max
     write /dev/cpuctl/foreground_window/cpu.shares 10240
 
     # NeuralNetwork API HAL tasks
@@ -129,7 +130,7 @@ on init
 
     # Top app tasks
     write /dev/cpuctl/top-app/cpu.uclamp.latency_sensitive 1
-    write /dev/cpuctl/foreground/cpu.uclamp.min 0
+    write /dev/cpuctl/top-app/cpu.uclamp.min 0
     write /dev/cpuctl/top-app/cpu.uclamp.max max
     write /dev/cpuctl/top-app/cpu.shares 20480
 
