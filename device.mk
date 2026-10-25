@@ -6,9 +6,6 @@
 
 DEVICE_PATH := device/xiaomi/rodin
 
-# Basic Call Recorder
-$(call inherit-product, vendor/bcr/bcr.mk)
-
 # Enforce generic ramdisk allow list
 $(call inherit-product, $(SRC_TARGET_DIR)/product/generic_ramdisk.mk)
 
