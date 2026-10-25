@@ -28,11 +28,9 @@ import android.os.Handler
 import android.os.Looper
 import androidx.preference.PreferenceManager
 import com.xiaomi.settings.gamebar.ForegroundAppDetector
-import vendor.xiaomi.hw.touchfeature.ITouchFeature
 
 class TouchSamplingService : Service() {
 
-    private var mTouchFeature: ITouchFeature? = null
     private var mScreenUnlockReceiver: BroadcastReceiver? = null
     private var mPreferenceChangeListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
     private var mHandler: Handler? = null
@@ -41,9 +39,6 @@ class TouchSamplingService : Service() {
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "TouchSamplingService started")
-
-        // Initialize the touchfeature
-        initTouchFeature()
 
         // Initialize and register the broadcast receiver
         registerScreenUnlockReceiver()
@@ -92,19 +87,6 @@ class TouchSamplingService : Service() {
 
     override fun onBind(intent: Intent): IBinder? {
         return null
-    }
-
-    private fun initTouchFeature() {
-        try {
-            val name = "default"
-            val fqName = ITouchFeature.DESCRIPTOR + "/" + name
-            val binder = android.os.Binder.allowBlocking(
-                android.os.ServiceManager.waitForDeclaredService(fqName)
-            )
-            mTouchFeature = ITouchFeature.Stub.asInterface(binder)
-        } catch (e: Exception) {
-            // Silent catch
-        }
     }
 
     /**
@@ -167,14 +149,8 @@ class TouchSamplingService : Service() {
             // Avoid reapplying the same state repeatedly
             if (mLastAppliedState == state) return
 
-            if (mTouchFeature != null) {
-                mTouchFeature!!.setTouchMode(0, TOUCH_GAME_MODE, state)
-                mTouchFeature!!.setTouchMode(0, 202, state)
-                mTouchFeature!!.setTouchMode(0, 1, state)
-                mTouchFeature!!.setTouchMode(0, 3, if (state == 1) 34 else 0)
-                mTouchFeature!!.setTouchMode(0, 2, if (state == 1) 99 else 0)
-                mTouchFeature!!.setTouchMode(0, 7, if (state == 1) 0 else 1)
-            }
+            // TODO: touchfeature AIDL (vendor.xiaomi.hw.touchfeature) not available in tree,
+            // so hardware touch mode is not applied here.
             mLastAppliedState = state
         } catch (e: Exception) {
             Log.e(TAG, "Failed to set touch sampling state", e)
@@ -224,6 +200,5 @@ class TouchSamplingService : Service() {
     companion object {
         private const val TAG = "TouchSamplingService"
         private val DEBUG = Log.isLoggable(TAG, Log.DEBUG)
-        private const val TOUCH_GAME_MODE = 0
     }
 }
